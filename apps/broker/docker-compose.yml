@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: octano-db
+    environment:
+      POSTGRES_USER: octano
+      POSTGRES_PASSWORD: octano
+      POSTGRES_DB: octano
+      TZ: America/Puerto_Rico
+    ports:
+      - '5432:5432'
+    volumes:
+      - octano-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U octano -d octano']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  octano-db:

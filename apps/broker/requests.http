@@ -1,0 +1,101 @@
+### Pruebas rápidas del broker (VS Code REST Client / IntelliJ HTTP)
+@base = http://localhost:8090
+@rm = http://localhost:8180/cse.api.v1
+
+### Salud
+GET {{base}}/health
+
+### Login del cliente semilla (cualquier clave en desarrollo)
+# @name login
+POST {{base}}/v1/auth/customer/login
+Content-Type: application/json
+
+{ "phone": "+17875550142", "password": "1234" }
+
+### Guarda el token
+@token = {{login.response.body.token}}
+
+### Perfil + cartera
+GET {{base}}/v1/me
+Authorization: Bearer {{token}}
+
+### Estaciones con precios vigentes
+GET {{base}}/v1/stations
+Authorization: Bearer {{token}}
+
+### Catálogo del minimarket
+GET {{base}}/v1/stations/11111111-1111-1111-1111-111111111111/products
+Authorization: Bearer {{token}}
+
+### 1 · Crear la orden (techo $30 de regular + un café)
+# @name order
+POST {{base}}/v1/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "stationId": "11111111-1111-1111-1111-111111111111",
+  "fuelCode": "r87",
+  "capAmount": 30,
+  "items": [{ "itemCode": "MM-CAFE-16", "qty": 1 }]
+}
+
+@orderId = {{order.response.body.id}}
+
+### 2 · Autorizar la retención (techo + minimarket)
+POST {{base}}/v1/orders/{{orderId}}/authorize
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### 3 · «Estoy aquí» — surtidor 3 (dispara FuelPumpAuthorize en RM)
+POST {{base}}/v1/orders/{{orderId}}/arrive
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "pumpNumber": 3 }
+
+### Estado de la orden
+GET {{base}}/v1/orders/{{orderId}}
+Authorization: Bearer {{token}}
+
+### Login del empleado semilla
+# @name emp
+POST {{base}}/v1/auth/employee/login
+Content-Type: application/json
+
+{ "badge": "EMP-0142", "pin": "1234" }
+
+@etoken = {{emp.response.body.token}}
+
+### Cola del handheld
+GET {{base}}/v1/tasks
+Authorization: Bearer {{etoken}}
+
+### Cierre manual del surtido (respaldo cuando no llega el pulso del PTS-2)
+# Reemplaza <taskId> con el id de la tarea
+POST {{base}}/v1/tasks/<taskId>/close
+Authorization: Bearer {{etoken}}
+Content-Type: application/json
+
+{ "dispensedAmount": 21.40 }
+
+### Recibo
+GET {{base}}/v1/orders/{{orderId}}/receipt
+Authorization: Bearer {{token}}
+
+### Operación
+GET {{base}}/v1/admin/overview
+
+###
+GET {{base}}/v1/admin/rm/ping
+
+###
+GET {{base}}/v1/admin/pts/status
+
+### Directo a Retail Manager, para comparar
+GET {{rm}}/ServerTime
+
+###
+GET {{rm}}/FuelPumpStatus?Pump=1

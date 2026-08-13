@@ -1,0 +1,30 @@
+# Material de diseño / mockups (no es parte del código de las apps)
+*.dc.html
+deck-stage.js
+support.js
+github.md
+scratchpad.md
+.thumbnail
+assets/
+uploads/
+
+# Node
+node_modules/
+dist/
+*.log
+
+# Flutter/Dart
+**/.dart_tool/
+**/.packages
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/pubspec.lock
+**/.idea/
+**/.vscode/
+*.iml
+
+# Env
+.env
+*.env
+!*.env.example
