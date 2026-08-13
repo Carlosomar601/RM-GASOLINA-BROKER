@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>doc-page:not(:defined){visibility:hidden}</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.85in" style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #15191B; font-size: 14.5px; line-height: 1.6;">
+
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+  <div style="width: 30px; height: 30px; border-radius: 9px; background: #1FC16B; color: #0C130F; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center;">O</div>
+  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.2px; color: #6B7775;">MANUAL DE INSTALACIÓN · APP DEL EMPLEADO (HANDHELD, FLUTTER)</span>
+</div>
+
+<h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin: 6px 0 4px;">App del empleado — instalación</h1>
+<p style="margin: 0 0 26px; color: #4B5654; font-size: 14.5px;">Proyecto Flutter independiente para el handheld de pista. Android primero; iOS es opcional.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">1 · Obtener el código</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">git clone https://github.com/Carlosomar601/RM-GASOLINA-BROKER.git
+cd RM-GASOLINA-BROKER/apps/employee_app</pre>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">2 · Generar las carpetas nativas</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter create . --project-name employee_app --platforms=android
+flutter pub get</pre>
+<p>Es un proyecto Flutter independiente de la app del cliente — no comparte <code>pubspec.yaml</code>, aunque copia el mismo sistema visual (paleta, tipografía, componentes).</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">3 · Modo demo vs. broker real</h2>
+<p>Sin variables, corre con la cola de órdenes de demostración:</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run</pre>
+<p>Para conectarlo al broker (esto activa la pantalla de abrir turno con placa + PIN):</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run --dart-define=OCTANO_API=http://192.168.100.20:8090</pre>
+<p>El handheld guarda el turno entre arranques (placa, estación y rol) — no vuelve a pedir el PIN salvo que el token venza o se cierre sesión.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">4 · Dar de alta a un empleado</h2>
+<p>Cada empleado necesita una fila en la tabla <code>employees</code> del broker con su placa, PIN (cifrado) y estación asignada — se administra desde el panel de administración o directamente por API. Sin esto, el login del handheld rechaza la entrada.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">5 · Generar el instalable</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter build apk --release --dart-define=OCTANO_API=https://broker.tudominio.com
+# el APK queda en build/app/outputs/flutter-apk/app-release.apk</pre>
+<p>Instala ese APK en el handheld físico de la estación (transferencia directa o un canal de distribución interno — no hace falta tienda de apps para uso propio).</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Solución de problemas</h2>
+<ul style="padding-left: 22px;">
+  <li><strong>Placa o PIN incorrectos:</strong> confirma que el empleado exista en esa estación específica — la placa es única por estación, no global.</li>
+  <li><strong>La cola no se actualiza sola:</strong> revisa el indicador LIVE/CLOUD/OFF de la barra superior; si dice OFF, es un problema de red del handheld, no del broker.</li>
+  <li><strong>No aparece la pantalla de turno:</strong> falta el <code>--dart-define=OCTANO_API=…</code> al compilar — sin él, la app siempre abre en modo demo.</li>
+</ul>
+
+</doc-page>
+
+</x-dc>
+</body>
+</html>

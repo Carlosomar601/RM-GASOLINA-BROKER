@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>doc-page:not(:defined){visibility:hidden}</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.85in" style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #15191B; font-size: 14.5px; line-height: 1.6;">
+
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+  <div style="width: 30px; height: 30px; border-radius: 9px; background: #1FC16B; color: #0C130F; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center;">O</div>
+  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.2px; color: #6B7775;">MANUAL DE INSTALACIÓN · APP DEL CLIENTE (FLUTTER)</span>
+</div>
+
+<h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin: 6px 0 4px;">App del cliente — instalación</h1>
+<p style="margin: 0 0 26px; color: #4B5654; font-size: 14.5px;">Flutter 3.19+ / Dart 3.3+. Corre en modo demo sin broker, o conectada al broker real.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">1 · Obtener el código</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">git clone https://github.com/Carlosomar601/RM-GASOLINA-BROKER.git
+cd RM-GASOLINA-BROKER/apps/user_app</pre>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">2 · Generar las carpetas nativas</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter create . --project-name user_app --platforms=android,ios
+flutter pub get</pre>
+<p><code>flutter create .</code> no borra <code>lib/</code> ni <code>pubspec.yaml</code>, solo agrega lo que falta. Si pregunta por sobrescribir <code>pubspec.yaml</code>, responde que no.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">3 · Permisos nativos</h2>
+<p>La app usa cámara (QR del surtidor) y micrófono (voz). Agrega:</p>
+<p style="margin: 14px 0 4px; font-weight: 600;">android/app/src/main/AndroidManifest.xml — dentro de &lt;manifest&gt;</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; overflow-x: auto; break-inside: avoid;">&lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+&lt;uses-permission android:name="android.permission.CAMERA" /&gt;
+&lt;uses-permission android:name="android.permission.RECORD_AUDIO" /&gt;</pre>
+<p style="margin: 14px 0 4px; font-weight: 600;">ios/Runner/Info.plist</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; overflow-x: auto; break-inside: avoid;">&lt;key&gt;NSCameraUsageDescription&lt;/key&gt;
+&lt;string&gt;Para escanear el QR del surtidor.&lt;/string&gt;
+&lt;key&gt;NSMicrophoneUsageDescription&lt;/key&gt;
+&lt;string&gt;Para pedir combustible y artículos por voz.&lt;/string&gt;
+&lt;key&gt;NSSpeechRecognitionUsageDescription&lt;/key&gt;
+&lt;string&gt;Para entender tu pedido dictado.&lt;/string&gt;</pre>
+<p style="background: #F3F1EA; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #4B5654;">Sin estos permisos la app no se rompe: el escáner ofrece escoger el surtidor por número y la voz cae a un dictado simulado.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">4 · Modo demo vs. broker real</h2>
+<p>Sin variables adicionales, la app corre en <strong>modo demo</strong> (estaciones y catálogo de muestra, surtido simulado):</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run</pre>
+<p>Para conectarla al broker, pasa su URL al compilar:</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run --dart-define=OCTANO_API=http://192.168.100.20:8090</pre>
+<table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px;">
+<thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Define</th><th style="text-align: left; padding: 6px 8px;">Para qué</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">OCTANO_API</td><td style="padding: 6px 8px;">URL base del broker. Vacío = modo demo.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">OCTANO_STATION</td><td style="padding: 6px 8px;">UUID de estación por defecto, útil en pruebas de campo.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">OCTANO_POLL</td><td style="padding: 6px 8px;">Segundos entre sondeos de respaldo del surtido (3 por omisión).</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">5 · Generar el instalable</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter build apk --release --dart-define=OCTANO_API=https://broker.tudominio.com
+# el APK queda en build/app/outputs/flutter-apk/app-release.apk</pre>
+<p>Para iOS, usa <code>flutter build ipa</code> desde una Mac con Xcode configurado y firma de desarrollador.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Solución de problemas</h2>
+<ul style="padding-left: 22px;">
+  <li><strong>La app no conecta:</strong> confirma que el teléfono y el broker estén en la misma red, y que <code>OCTANO_API</code> no tenga <code>/</code> final.</li>
+  <li><strong>El escáner no abre la cámara:</strong> revisa el permiso de cámara en los ajustes del sistema del equipo.</li>
+  <li><strong>La sesión no persiste:</strong> el token guardado venció — vuelve a iniciar sesión.</li>
+</ul>
+
+</doc-page>
+
+</x-dc>
+</body>
+</html>

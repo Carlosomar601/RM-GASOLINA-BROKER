@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>doc-page:not(:defined){visibility:hidden}</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.85in" style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #15191B; font-size: 15px; line-height: 1.65;">
+
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+  <div style="width: 30px; height: 30px; border-radius: 9px; background: #1FC16B; color: #0C130F; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center;">O</div>
+  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.2px; color: #6B7775;">MANUAL DE USUARIO · APP DEL EMPLEADO (HANDHELD)</span>
+</div>
+
+<h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin: 6px 0 4px;">Octano Pista — guía del atendiente</h1>
+<p style="margin: 0 0 28px; color: #4B5654; font-size: 15px;">Cómo recibir, preparar y entregar cada orden desde el handheld, paso a paso.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Abrir turno</h2>
+<p>Entra con tu <strong>placa de empleado</strong> (por ejemplo <code>EMP-0142</code>) y tu <strong>PIN</strong> de 4 a 6 dígitos en el teclado numérico. El turno queda abierto en el equipo — no hace falta repetir el PIN cada vez que usas el handheld, salvo que cierres sesión o expire el turno.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Panel principal</h2>
+<p>Al abrir turno ves tus métricas del día (órdenes servidas, litros, minutos promedio en pista), el interruptor de turno abierto/cerrado, y la cola de órdenes activas. Un aviso destacado aparece cuando llega un cliente nuevo a la estación.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">1 · Cliente en estación</h2>
+<p>Cuando un cliente llega y confirma su surtidor desde la app, te llega una alerta con: surtidor, foto de cuenta, tablilla, combustible y techo, y los artículos del minimarket si pidió algo. Toca <strong>«Aceptar»</strong> para tomar la orden.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">2 · Preparar el pedido (picking)</h2>
+<p>Si la orden trae minimarket, verás la lista de artículos por pasillo. Marca cada uno al recogerlo. Si un artículo no está disponible, toca <strong>«Sustituir»</strong> — queda marcado como sustituido para que el cliente lo vea en su recibo. Cuando todo esté marcado, avanza a la entrega.</p>
+<p>Si la orden es solo combustible, salta directo a la entrega.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">3 · Entrega — tres pasos</h2>
+
+<p style="margin: 14px 0 4px;"><strong>Paso 1 · confirmar identidad</strong></p>
+<p style="margin: 0;">Compara la foto de cuenta del cliente con la persona y el vehículo en pista (tablilla, marca, color). Toca <strong>«Coincide»</strong> para continuar o <strong>«No coincide»</strong> si algo no cuadra — la orden pasa a revisión de un supervisor y no se entrega.</p>
+
+<p style="margin: 14px 0 4px;"><strong>Paso 2 · surtir combustible</strong></p>
+<p style="margin: 0;">El monto y los litros se llenan solos desde el surtidor. Si el sistema no recibe el pulso del controlador, usa el control manual para cerrar el surtido con el monto real — nunca por encima del techo autorizado.</p>
+
+<p style="margin: 14px 0 4px;"><strong>Paso 3 · entregar artículos</strong></p>
+<p style="margin: 0;">Si había minimarket, confirma la entrega en mano y toca <strong>«Completar orden»</strong>. El cobro final, la liberación de la diferencia y el envío de la factura quedan automáticos.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Roles y permisos</h2>
+<p>Tu rol (atendiente, cajero, supervisor, gerente) llega con tu sesión y determina qué puedes hacer en el handheld. Un supervisor puede reabrir o reasignar órdenes escaladas por identidad no coincidente.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Conexión y estado</h2>
+<p>La barra superior muestra el estado de la nube:</p>
+<table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px;">
+<thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Indicador</th><th style="text-align: left; padding: 6px 8px;">Significado</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">LIVE</td><td style="padding: 6px 8px;">Conectado en tiempo real; la cola se actualiza sola.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">CLOUD</td><td style="padding: 6px 8px;">Conectado pero sin tiempo real; la cola se refresca cada 20 segundos.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">OFF</td><td style="padding: 6px 8px;">Sin conexión con el sistema. Reintenta solo; si persiste, avisa al supervisor.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; margin: 30px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Si algo no cuadra</h2>
+<ul style="padding-left: 22px;">
+  <li><strong>El surtidor no arranca</strong> tras aceptar: revisa que el número de surtidor coincida con el físico; si no, escala a supervisor.</li>
+  <li><strong>El monto del surtido no llega solo</strong>: usa el cierre manual con el monto real que muestra la bomba — el sistema no te deja cobrar más del techo.</li>
+  <li><strong>La foto no coincide</strong>: nunca entregues. Marca «No coincide» y espera al supervisor.</li>
+</ul>
+
+</doc-page>
+
+</x-dc>
+</body>
+</html>

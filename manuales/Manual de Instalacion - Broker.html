@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>doc-page:not(:defined){visibility:hidden}</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.85in" style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #15191B; font-size: 14.5px; line-height: 1.6;">
+
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+  <div style="width: 30px; height: 30px; border-radius: 9px; background: #1FC16B; color: #0C130F; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center;">O</div>
+  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.2px; color: #6B7775;">MANUAL DE INSTALACIÓN · BROKER (NODE + POSTGRES)</span>
+</div>
+
+<h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin: 6px 0 4px;">Broker Octano — instalación y arranque</h1>
+<p style="margin: 0 0 26px; color: #4B5654; font-size: 14.5px;">API que conecta las apps móviles con Retail Manager y el controlador PTS-2. Node 20 + Fastify + Postgres.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Requisitos</h2>
+<ul style="padding-left: 22px;">
+  <li>Node.js 20.11 o más reciente.</li>
+  <li>Postgres 14 o más reciente (local, o el `docker-compose.yml` incluido).</li>
+  <li>Acceso de red a Retail Manager y al controlador PTS-2/PTS2Link de cada estación.</li>
+</ul>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">1 · Obtener el código</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">git clone https://github.com/Carlosomar601/RM-GASOLINA-BROKER.git
+cd RM-GASOLINA-BROKER/apps/broker</pre>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">2 · Levantar Postgres</h2>
+<p>Con Docker (más rápido para desarrollo):</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">docker compose up -d</pre>
+<p>O apunta <code>DATABASE_URL</code> a un Postgres que ya tengas corriendo.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">3 · Variables de entorno</h2>
+<p>Copia <code>.env.example</code> a <code>.env</code> y ajusta:</p>
+<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+<thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Variable</th><th style="text-align: left; padding: 6px 8px;">Para qué</th><th style="text-align: left; padding: 6px 8px;">Por omisión</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">DATABASE_URL</td><td style="padding: 6px 8px;">Conexión a Postgres</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace; color: #6B7775;">postgres://octano:octano@localhost:5432/octano</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">PORT</td><td style="padding: 6px 8px;">Puerto del broker</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace; color: #6B7775;">8090</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">JWT_SECRET</td><td style="padding: 6px 8px;">Firma los tokens de sesión</td><td style="padding: 6px 8px; color: #E5484D;">cambiar en producción</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">MASTER_KEY</td><td style="padding: 6px 8px;">Cifra los secretos de integraciones (AES-256-GCM)</td><td style="padding: 6px 8px; color: #E5484D;">cambiar en producción</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">ADMIN_TOKEN</td><td style="padding: 6px 8px;">Protege <code>/v1/admin/*</code></td><td style="padding: 6px 8px; color: #F5A524;">vacío = abierto, solo dev</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">RM_API_BASE / RM_API_USER_ID / RM_API_USER_PASS</td><td style="padding: 6px 8px;">Valores por omisión de Retail Manager (solo primer arranque; cada estación trae los suyos después)</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace; color: #6B7775;">localhost:8180</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">PTS2LINK_BASE</td><td style="padding: 6px 8px;">Valor por omisión de PTS2Link</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace; color: #6B7775;">localhost:9080</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">HOLD_TTL_MINUTES</td><td style="padding: 6px 8px;">Minutos antes de que venza una retención sin usar</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace; color: #6B7775;">60</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">MAX_AUTH_AMOUNT</td><td style="padding: 6px 8px;">Techo máximo permitido por orden</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace; color: #6B7775;">200</td></tr>
+</tbody>
+</table>
+<p style="background: #F3F1EA; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #4B5654; margin-top: 12px;"><strong>Importante:</strong> los endpoints reales de Retail Manager y PTS2Link de cada estación NO van en <code>.env</code> — se administran por API (<code>/v1/admin/integrations</code>) y quedan cifrados en la base con <code>MASTER_KEY</code>. Ver el manual del proyecto completo.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">4 · Instalar y preparar la base</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">npm install
+npm run migrate
+npm run seed        # datos de la estación de desarrollo (opcional)</pre>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">5 · Arrancar</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">npm run dev          # desarrollo, recarga automática
+# — o para producción —
+npm run build
+npm start</pre>
+<p>Confirma que está vivo:</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">curl http://localhost:8090/health</pre>
+<p>Debe responder <code>{"status":"ok", "db": true, ...}</code>.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">6 · Configurar una estación nueva</h2>
+<ol style="padding-left: 22px;">
+  <li>Crea el operador (tenant) y la estación vía <code>/v1/admin/tenants</code> y <code>/v1/admin/stations</code>.</li>
+  <li>Registra sus integraciones (<code>rm_api</code>, <code>pts2link</code>, <code>payments</code>) vía <code>/v1/admin/integrations</code> — cada una con su propia base URL y credenciales.</li>
+  <li>Prueba cada enlace con <code>/v1/admin/integrations/:id/test</code>.</li>
+  <li>Revisa la configuración final que usará el broker en <code>/v1/admin/stations/:id/effective-config</code>.</li>
+  <li>Carga bombas, mangueras y tanques (ver semilla de ejemplo en <code>db/migrations/002_seed_dev.sql</code> como plantilla).</li>
+</ol>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Solución de problemas</h2>
+<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px;">
+<thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Síntoma</th><th style="text-align: left; padding: 6px 8px;">Causa probable</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px;"><code>/health</code> responde <code>db: false</code></td><td style="padding: 6px 8px;"><code>DATABASE_URL</code> incorrecta o Postgres no está corriendo.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px;">Falta la variable de entorno X</td><td style="padding: 6px 8px;">No se copió <code>.env.example</code> a <code>.env</code>, o falta esa clave.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px;">Las apps no autentican</td><td style="padding: 6px 8px;"><code>JWT_SECRET</code> cambió entre reinicios — invalida todas las sesiones activas.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px;">Una integración guardada deja de descifrar</td><td style="padding: 6px 8px;"><code>MASTER_KEY</code> cambió — hay que volver a capturar esos secretos.</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px;">Facturas atascadas en <code>rm_outbox</code></td><td style="padding: 6px 8px;">Retail Manager no responde; usa <code>POST /v1/admin/outbox/retry</code> cuando vuelva.</td></tr>
+</tbody>
+</table>
+
+</doc-page>
+
+</x-dc>
+</body>
+</html>

@@ -1,12 +1,12 @@
-# Material de diseño / mockups (no es parte del código de las apps)
-*.dc.html
-deck-stage.js
-support.js
-github.md
-scratchpad.md
-.thumbnail
-assets/
-uploads/
+# Material de diseño / mockups en la raíz (no es parte del código de las apps)
+/*.dc.html
+/deck-stage.js
+/support.js
+/github.md
+/scratchpad.md
+/.thumbnail
+/assets/
+/uploads/
 
 # Node
 node_modules/

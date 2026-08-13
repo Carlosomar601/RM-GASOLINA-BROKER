@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>doc-page:not(:defined){visibility:hidden}</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.85in" style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #15191B; font-size: 14.5px; line-height: 1.6;">
+
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+  <div style="width: 30px; height: 30px; border-radius: 9px; background: #1FC16B; color: #0C130F; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center;">O</div>
+  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.2px; color: #6B7775;">MANUAL DE INSTALACIÓN · PROYECTO COMPLETO</span>
+</div>
+
+<h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin: 6px 0 4px;">Octano — puesta en marcha de punta a punta</h1>
+<p style="margin: 0 0 26px; color: #4B5654; font-size: 14.5px;">Cómo encajan el broker, la app del cliente, la app del empleado y el equipo de la estación — y en qué orden se levanta todo.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Las piezas</h2>
+<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px;">
+<thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Pieza</th><th style="text-align: left; padding: 6px 8px;">Qué hace</th><th style="text-align: left; padding: 6px 8px;">Dónde vive</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">Broker</td><td style="padding: 6px 8px;">API de nube: órdenes, pagos, tiempo real, enlaces con RM y el controlador</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">apps/broker</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">App del cliente</td><td style="padding: 6px 8px;">Compra prepago desde el carro (Flutter, Android/iOS)</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">apps/user_app</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">App del empleado</td><td style="padding: 6px 8px;">Handheld de pista: recibe, prepara y entrega la orden (Flutter, Android)</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">apps/employee_app</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">Postgres</td><td style="padding: 6px 8px;">Base de datos del broker — órdenes, estaciones, integraciones cifradas</td><td style="padding: 6px 8px;">servidor propio o el <code>docker-compose.yml</code> del broker</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">Retail Manager</td><td style="padding: 6px 8px;">POS de la estación — recibe la factura de cada orden liquidada</td><td style="padding: 6px 8px;">servidor del POS, por estación</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">PTS2Link / controlador PTS-2</td><td style="padding: 6px 8px;">Autoriza y mide el surtido en la bomba física</td><td style="padding: 6px 8px;">equipo de la estación, ej. 192.168.100.251</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Cómo se habla la información</h2>
+<p>Cliente y handheld nunca se hablan directamente — todo pasa por el broker, que es también el único que le escribe a Retail Manager y al controlador. Cada orden lleva un <code>edge_transaction_uuid</code> único desde que se crea en la app hasta que llega a Retail Manager: es la llave que amarra pago, surtidor y factura como la misma transacción en los tres sistemas.</p>
+<p>Si Retail Manager está caído, la orden se cierra igual — la factura espera en una cola (<code>rm_outbox</code>) con reintentos automáticos, así el POS nunca bloquea la venta.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Orden de instalación</h2>
+<ol style="padding-left: 22px;">
+  <li><strong>Broker + Postgres primero.</strong> Ninguna app funciona en modo real sin él. Ver «Manual de instalación · Broker».</li>
+  <li><strong>Dar de alta la estación</strong> en el broker: operador, estación, integraciones con Retail Manager y PTS2Link, bombas/mangueras/tanques.</li>
+  <li><strong>Confirmar el enlace con el equipo de la estación:</strong> que el broker alcance por red tanto Retail Manager como el controlador PTS-2/PTS2Link.</li>
+  <li><strong>Dar de alta a los empleados</strong> de esa estación (placa + PIN) antes de instalar el handheld.</li>
+  <li><strong>Compilar ambas apps</strong> apuntando al broker con <code>--dart-define=OCTANO_API=…</code>. Ver los manuales de instalación de cada app.</li>
+  <li><strong>Probar el circuito completo</strong> con una orden real de punta a punta antes de dar la estación por lista: crear cuenta → autorizar → llegar → surtir → recibo → verificar que la factura llegó a Retail Manager.</li>
+</ol>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Red y direcciones</h2>
+<p>El broker necesita alcanzar, en la red de cada estación:</p>
+<ul style="padding-left: 22px;">
+  <li>El servidor de Retail Manager (API v2 / POSDPS-FDLink).</li>
+  <li>PTS2Link, y a través de él, el controlador PTS-2 (en la estación de desarrollo: <code>192.168.100.251</code>, 4 bombas, 3 tanques).</li>
+</ul>
+<p>Las apps móviles solo necesitan alcanzar al broker — nunca hablan directo con Retail Manager ni con el controlador.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Estructura del repositorio</h2>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">RM-GASOLINA-BROKER/          (monorepo, un solo repo de GitHub)
+  apps/broker/                Node + TypeScript + Postgres
+  apps/user_app/              Flutter — app del cliente
+  apps/employee_app/          Flutter — app del empleado</pre>
+<p>Las tres piezas viven en un solo repositorio porque cambian juntas: un cambio en un endpoint del broker casi siempre implica un cambio en alguna de las dos apps el mismo día.</p>
+
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Pendientes antes de producción</h2>
+<ul style="padding-left: 22px;">
+  <li>El <code>ProductCode</code> de Retail Manager para la línea de combustible en <code>ImportExternalInvoice</code>.</li>
+  <li>Reglas de IVU de Puerto Rico por estación (o un porcentaje fijo mientras tanto).</li>
+  <li>Conectar el procesador de pagos real — hoy la retención y captura son internas al broker, para poder probar el flujo sin cobrar de verdad.</li>
+  <li>Rutas exactas de PTS2Link con el formato de sus parámetros (hoy configurables por plantilla, ej. <code>{pump}</code>).</li>
+</ul>
+
+</doc-page>
+
+</x-dc>
+</body>
+</html>
