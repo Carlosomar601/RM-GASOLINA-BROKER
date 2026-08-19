@@ -1,0 +1,1528 @@
+{
+  "info": {
+    "name": "Octano Broker API",
+    "description": "Broker multi-tenant Octano (gasolina + minimarket, Puerto Rico). Base URL en {{baseUrl}}. Flujo típico: 1) login cliente o empleado para obtener token, 2) admin crea operador/estación/enlaces/reglas y activa, 3) cliente hace la orden completa, 4) empleado la atiende desde el handheld.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://rmbroker.retailmanagerpr.com"
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "employeeToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "stationId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    },
+    {
+      "key": "itemId",
+      "value": ""
+    },
+    {
+      "key": "tenantId",
+      "value": ""
+    },
+    {
+      "key": "integrationId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0 · Salud",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/health",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Sin auth. Confirma que el broker y la base de datos están vivos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 · Auth",
+      "item": [
+        {
+          "name": "Cliente · Registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/auth/customer/register",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "customer",
+                "register"
+              ]
+            },
+            "description": "Crea cliente + wallet en $0 + vehículo por defecto (todos opcionales salvo phone/fullName/password). Devuelve {token, customerId}. Guarda el token en {{customerToken}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"7871234567\",\n  \"fullName\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"1234\",\n  \"plate\": \"ABC123\",\n  \"vehicle\": \"Toyota Corolla\",\n  \"color\": \"Gris\",\n  \"tankLiters\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cliente · Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/auth/customer/login",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "customer",
+                "login"
+              ]
+            },
+            "description": "Devuelve {token, customerId}. En este ambiente, si el cliente no tiene password_hash cualquier clave funciona.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"7871234567\",\n  \"password\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Empleado · Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/auth/employee/login",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "employee",
+                "login"
+              ]
+            },
+            "description": "badge = placa/insignia del empleado (mayúsculas). Devuelve {token, employeeId, stationId, role}. Guarda el token en {{employeeToken}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"badge\": \"EMP-01\",\n  \"pin\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 · Cliente · Catálogo y perfil",
+      "item": [
+        {
+          "name": "Estaciones del operador",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/stations",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "stations"
+              ]
+            },
+            "description": "Estaciones activas del tenant del cliente, con precios de combustible vigentes por grado."
+          }
+        },
+        {
+          "name": "Productos del minimarket",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/stations/{{stationId}}/products",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "stations",
+                "{{stationId}}",
+                "products"
+              ]
+            },
+            "description": "Espejo del POS: catálogo activo con precio y si hay stock."
+          }
+        },
+        {
+          "name": "Bombas de una estación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/stations/{{stationId}}/pumps",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "stations",
+                "{{stationId}}",
+                "pumps"
+              ]
+            },
+            "description": "Estado de cada surtidor y si está ocupado por otra orden."
+          }
+        },
+        {
+          "name": "Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/me",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "me"
+              ]
+            },
+            "description": "Perfil + saldo de wallet + vehículos + métodos de pago guardados."
+          }
+        },
+        {
+          "name": "Recargar wallet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/me/wallet/topup",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "me",
+                "wallet",
+                "topup"
+              ]
+            },
+            "description": "Recarga simulada (en producción la dispara el procesador de pagos). Máx $500 por llamada.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 · Cliente · Flujo de orden",
+      "item": [
+        {
+          "name": "1) Crear orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders"
+              ]
+            },
+            "description": "fuelCode debe existir en fuel_products de esa estación (r87/p93/dsl/lpg). capAmount = techo en $ (5–500). items opcional (minimarket). Devuelve la orden en \"draft\". Guarda id en {{orderId}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stationId\": \"{{stationId}}\",\n  \"fuelCode\": \"r87\",\n  \"capAmount\": 30,\n  \"items\": [\n    {\n      \"itemCode\": \"SKU-001\",\n      \"qty\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "2) Autorizar (retener fondos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders/{{orderId}}/authorize",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "{{orderId}}",
+                "authorize"
+              ]
+            },
+            "description": "Coloca el hold por (capAmount + itemsAmount). Sin paymentMethodId usa el método por defecto del cliente. No cobra todavía — solo autoriza.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethodId\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "3) Llegué al surtidor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders/{{orderId}}/arrive",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "{{orderId}}",
+                "arrive"
+              ]
+            },
+            "description": "Usa pumpNumber o qrToken (uno de los dos). Aquí el broker manda FuelPumpAuthorize a Retail Manager y crea la tarea para el handheld. La orden pasa a \"arrived\".",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pumpNumber\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cancelar orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders/{{orderId}}/cancel",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "{{orderId}}",
+                "cancel"
+              ]
+            },
+            "description": "Solo mientras esté en draft/authorized/arrived (antes de empezar a surtir). Libera el hold.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"cambié de opinión\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Ver estado de la orden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders/{{orderId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "{{orderId}}"
+              ]
+            },
+            "description": "Poll de respaldo — el estado real llega por WebSocket en /v1/stream."
+          }
+        },
+        {
+          "name": "Mis órdenes recientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders?limit=10",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Recibo final",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/orders/{{orderId}}/receipt",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "{{orderId}}",
+                "receipt"
+              ]
+            },
+            "description": "Solo disponible cuando la orden está \"dispensed\" o \"settled\". Trae el desglose completo + factura de Retail Manager si ya se generó."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 · Empleado · Handheld",
+      "item": [
+        {
+          "name": "Cola de tareas del turno",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employeeToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/tasks",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "tasks"
+              ]
+            },
+            "description": "Tareas abiertas de la estación del empleado autenticado (según el token)."
+          }
+        },
+        {
+          "name": "Detalle de una tarea",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employeeToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/tasks/{{taskId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}"
+              ]
+            },
+            "description": "Incluye los artículos del minimarket a preparar, con pasillo."
+          }
+        },
+        {
+          "name": "Tomar la tarea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employeeToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/tasks/{{taskId}}/accept",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "accept"
+              ]
+            },
+            "description": "El empleado se asigna la tarea. Pasa a \"picking\" si hay artículos, o \"waiting\" si es solo combustible."
+          }
+        },
+        {
+          "name": "Marcar artículo recogido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employeeToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/tasks/{{taskId}}/items/{{itemId}}/pick",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "items",
+                "{{itemId}}",
+                "pick"
+              ]
+            },
+            "description": "Un llamado por artículo del picking.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"picked\": true,\n  \"substituted\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Verificar identidad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employeeToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/tasks/{{taskId}}/identity",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "identity"
+              ]
+            },
+            "description": "Antes de entregar: compara la foto del cliente. matches=false escala la tarea en vez de entregar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matches\": true,\n  \"note\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cerrar tarea manualmente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{employeeToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/tasks/{{taskId}}/close",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "tasks",
+                "{{taskId}}",
+                "close"
+              ]
+            },
+            "description": "Respaldo cuando el pulso del PTS-2 no llega solo. Cierra el surtido, cobra el hold y encola la factura a Retail Manager. dispensedAmount no puede superar el cap de la orden.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dispensedAmount\": 28.5,\n  \"dispensedVolume\": 8.923\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 · Admin · Operadores y estaciones",
+      "item": [
+        {
+          "name": "Listar operadores (tenants)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/tenants",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "tenants"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Crear operador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/tenants",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "tenants"
+              ]
+            },
+            "description": "Uno por cliente/marca. Guarda el id devuelto en {{tenantId}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"OCTANO\",\n  \"name\": \"Octano Isla Verde\",\n  \"contactName\": \"Carlos Omar\",\n  \"contactEmail\": \"carlos@octano.pr\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar estaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Crear estación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations"
+              ]
+            },
+            "description": "Nace en status \"onboarding\". Guarda el id en {{stationId}}. Repite este paso (mismo tenantId) para cada estación adicional del mismo operador.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantId\": \"{{tenantId}}\",\n  \"code\": \"ST-101\",\n  \"name\": \"Octano Isla Verde\",\n  \"address\": \"Ave. Isla Verde 5900\",\n  \"town\": \"Carolina\",\n  \"lat\": 18.4408,\n  \"lng\": -66.0084,\n  \"volumeUnit\": \"GAL\",\n  \"hasMinimarket\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Editar / activar estación",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}"
+              ]
+            },
+            "description": "status: onboarding | active | paused | disabled. Últim paso del onboarding — a partir de aquí las apps pueden operarla.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"isOpen\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Ver reglas de negocio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/rules",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "rules"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Guardar reglas de negocio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/rules",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "rules"
+              ]
+            },
+            "description": "cityTaxRate + stateTaxRate = el IVU de PR (municipal + estatal) para esa estación. maxAuthAmount es el techo permitido por orden.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cityTaxRate\": 0.01,\n  \"stateTaxRate\": 0.105,\n  \"holdTtlMinutes\": 30,\n  \"maxAuthAmount\": 150,\n  \"minAuthAmount\": 5,\n  \"fuelTaxable\": false,\n  \"itemsTaxable\": true,\n  \"invoiceSeries\": \"A\",\n  \"defaultRmClient\": \"2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 · Admin · Enlaces (Retail Manager / PTS2Link)",
+      "item": [
+        {
+          "name": "Listar enlaces",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations?stationId={{stationId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations"
+              ],
+              "query": [
+                {
+                  "key": "stationId",
+                  "value": "{{stationId}}"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Crear enlace Retail Manager",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations"
+              ]
+            },
+            "description": "baseUrl = IP:puerto del RM API v2 en la estación. username = número de cliente RM. Guarda el id en {{integrationId}} y reutilízalo para el \"Probar enlace\".",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantId\": \"{{tenantId}}\",\n  \"stationId\": \"{{stationId}}\",\n  \"kind\": \"rm_api\",\n  \"label\": \"Retail Manager\",\n  \"baseUrl\": \"http://192.168.100.10:8180\",\n  \"authType\": \"query\",\n  \"username\": \"2\",\n  \"secret\": \"CONTRASEÑA_RM\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear enlace PTS2Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations"
+              ]
+            },
+            "description": "baseUrl = el servicio PTS2Link que habla con el controlador de bombas en la estación.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantId\": \"{{tenantId}}\",\n  \"stationId\": \"{{stationId}}\",\n  \"kind\": \"pts2link\",\n  \"label\": \"PTS2Link\",\n  \"baseUrl\": \"http://192.168.100.30:9080\",\n  \"authType\": \"none\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Editar enlace",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations/{{integrationId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations",
+                "{{integrationId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Probar enlace",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations/{{integrationId}}/test",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations",
+                "{{integrationId}}",
+                "test"
+              ]
+            },
+            "description": "rm_api → ServerTime + Validez. pts2link → health + pumps. Guarda el resultado (ok/nota) en el enlace."
+          }
+        },
+        {
+          "name": "Historial de eventos del enlace",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations/{{integrationId}}/events",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations",
+                "{{integrationId}}",
+                "events"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Eliminar enlace",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/integrations/{{integrationId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "integrations",
+                "{{integrationId}}"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 · Admin · Operación y diagnóstico",
+      "item": [
+        {
+          "name": "Semáforo de todos los enlaces",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/links",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "links"
+              ]
+            },
+            "description": "Vista general (la que usa la pestaña \"Enlaces\" de la consola)."
+          }
+        },
+        {
+          "name": "Resumen operativo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/overview?stationId={{stationId}}",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "overview"
+              ],
+              "query": [
+                {
+                  "key": "stationId",
+                  "value": "{{stationId}}"
+                }
+              ]
+            },
+            "description": "Bombas, tanques, ventas de hoy, embudo de estados de orden y cola de outbox a RM."
+          }
+        },
+        {
+          "name": "Órdenes (filtro admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/orders?stationId={{stationId}}&status=&limit=50",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "stationId",
+                  "value": "{{stationId}}"
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Eventos de una orden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/orders/{{orderId}}/events",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "orders",
+                "{{orderId}}",
+                "events"
+              ]
+            },
+            "description": "Bitácora completa de esa orden (created, hold_placed, arrived, dispensed, etc)."
+          }
+        },
+        {
+          "name": "Audit log",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/audit",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "audit"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Ping a Retail Manager",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/rm/ping",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "rm",
+                "ping"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Estado de bombas (PTS)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/pts/status",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "pts",
+                "status"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mapeos bomba/manguera/tanque",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/mappings",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "mappings"
+              ]
+            },
+            "description": "Compara lo configurado en el broker (local) contra lo que reporta PTS2Link (remote)."
+          }
+        },
+        {
+          "name": "Sincronizar precios desde RM",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/sync-prices",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "sync-prices"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Sincronizar productos desde RM",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/stations/{{stationId}}/sync-products",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "stations",
+                "{{stationId}}",
+                "sync-products"
+              ]
+            },
+            "description": "Trae GetAllProducts de Retail Manager y actualiza la tabla de productos del minimarket."
+          }
+        },
+        {
+          "name": "Config efectiva de la estación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/stations/{{stationId}}/effective-config",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "stations",
+                "{{stationId}}",
+                "effective-config"
+              ]
+            },
+            "description": "Lo que el broker está usando realmente para esa estación (sin secretos)."
+          }
+        },
+        {
+          "name": "Reintentar outbox de facturas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-admin-token",
+                "value": "{{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "https://rmbroker.retailmanagerpr.com/v1/admin/outbox/retry",
+              "host": [
+                "https://rmbroker.retailmanagerpr.com"
+              ],
+              "path": [
+                "v1",
+                "admin",
+                "outbox",
+                "retry"
+              ]
+            },
+            "description": "Reencola hacia RM las facturas que quedaron \"failed\" o \"dead\"."
+          }
+        }
+      ]
+    }
+  ]
+}

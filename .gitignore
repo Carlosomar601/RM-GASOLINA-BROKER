@@ -2,11 +2,17 @@
 /*.dc.html
 /deck-stage.js
 /support.js
+/doc-page.js
 /github.md
 /scratchpad.md
 /.thumbnail
 /assets/
 /uploads/
+
+# Copias duplicadas sueltas en la raíz (el código real vive en apps/)
+/BROKER/
+/employee_app/
+/user_app/
 
 # Node
 node_modules/

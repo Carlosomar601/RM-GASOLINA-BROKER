@@ -69,8 +69,9 @@ npm run seed        # datos de la estación de desarrollo (opcional)</pre>
 # — o para producción —
 npm run build
 npm start</pre>
-<p>Confirma que está vivo:</p>
+<p>Confirma que está vivo (local):</p>
 <pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">curl http://localhost:8090/health</pre>
+<p>Este despliegue ya vive en <code>https://rmbroker.retailmanagerpr.com</code> — <code>curl https://rmbroker.retailmanagerpr.com/health</code> debe responder igual.</p>
 <p>Debe responder <code>{"status":"ok", "db": true, ...}</code>.</p>
 
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">6 · Configurar una estación nueva</h2>

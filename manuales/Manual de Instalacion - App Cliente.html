@@ -52,8 +52,8 @@ flutter pub get</pre>
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">4 · Modo demo vs. broker real</h2>
 <p>Sin variables adicionales, la app corre en <strong>modo demo</strong> (estaciones y catálogo de muestra, surtido simulado):</p>
 <pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run</pre>
-<p>Para conectarla al broker, pasa su URL al compilar:</p>
-<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run --dart-define=OCTANO_API=http://192.168.100.20:8090</pre>
+<p>Para conectarla al broker, pasa su URL al compilar (broker de este despliegue: <code>https://rmbroker.retailmanagerpr.com</code>; app cliente ya publicada como web en <code>https://usrapp.retailmanagerpr.com/</code>):</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run --dart-define=OCTANO_API=https://rmbroker.retailmanagerpr.com</pre>
 <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px;">
 <thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Define</th><th style="text-align: left; padding: 6px 8px;">Para qué</th></tr></thead>
 <tbody>
@@ -64,7 +64,7 @@ flutter pub get</pre>
 </table>
 
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">5 · Generar el instalable</h2>
-<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter build apk --release --dart-define=OCTANO_API=https://broker.tudominio.com
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter build apk --release --dart-define=OCTANO_API=https://rmbroker.retailmanagerpr.com
 # el APK queda en build/app/outputs/flutter-apk/app-release.apk</pre>
 <p>Para iOS, usa <code>flutter build ipa</code> desde una Mac con Xcode configurado y firma de desarrollador.</p>
 

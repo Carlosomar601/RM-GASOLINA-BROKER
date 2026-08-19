@@ -42,6 +42,16 @@
 <p>Cliente y handheld nunca se hablan directamente — todo pasa por el broker, que es también el único que le escribe a Retail Manager y al controlador. Cada orden lleva un <code>edge_transaction_uuid</code> único desde que se crea en la app hasta que llega a Retail Manager: es la llave que amarra pago, surtidor y factura como la misma transacción en los tres sistemas.</p>
 <p>Si Retail Manager está caído, la orden se cierra igual — la factura espera en una cola (<code>rm_outbox</code>) con reintentos automáticos, así el POS nunca bloquea la venta.</p>
 
+<h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">URLs de este despliegue</h2>
+<table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px;">
+<thead><tr style="border-bottom: 2px solid #15191B;"><th style="text-align: left; padding: 6px 8px;">Pieza</th><th style="text-align: left; padding: 6px 8px;">URL</th></tr></thead>
+<tbody>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">Broker (API)</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">https://rmbroker.retailmanagerpr.com</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">App del cliente (web)</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">https://usrapp.retailmanagerpr.com/</td></tr>
+<tr style="border-bottom: 1px solid #E5E2D9;"><td style="padding: 6px 8px; font-weight: 600;">App del empleado (web)</td><td style="padding: 6px 8px; font-family: 'JetBrains Mono', monospace;">https://empapp.retailmanagerpr.com/#/turno</td></tr>
+</tbody>
+</table>
+
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">Orden de instalación</h2>
 <ol style="padding-left: 22px;">
   <li><strong>Broker + Postgres primero.</strong> Ninguna app funciona en modo real sin él. Ver «Manual de instalación · Broker».</li>

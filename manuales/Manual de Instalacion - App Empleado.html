@@ -37,15 +37,15 @@ flutter pub get</pre>
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">3 · Modo demo vs. broker real</h2>
 <p>Sin variables, corre con la cola de órdenes de demostración:</p>
 <pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run</pre>
-<p>Para conectarlo al broker (esto activa la pantalla de abrir turno con placa + PIN):</p>
-<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run --dart-define=OCTANO_API=http://192.168.100.20:8090</pre>
+<p>Para conectarlo al broker (esto activa la pantalla de abrir turno con placa + PIN; handheld ya publicado como web en <code>https://empapp.retailmanagerpr.com/#/turno</code>):</p>
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter run --dart-define=OCTANO_API=https://rmbroker.retailmanagerpr.com</pre>
 <p>El handheld guarda el turno entre arranques (placa, estación y rol) — no vuelve a pedir el PIN salvo que el token venza o se cierre sesión.</p>
 
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">4 · Dar de alta a un empleado</h2>
 <p>Cada empleado necesita una fila en la tabla <code>employees</code> del broker con su placa, PIN (cifrado) y estación asignada — se administra desde el panel de administración o directamente por API. Sin esto, el login del handheld rechaza la entrada.</p>
 
 <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 600; margin: 26px 0 10px; border-bottom: 2px solid #1FC16B; padding-bottom: 6px;">5 · Generar el instalable</h2>
-<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter build apk --release --dart-define=OCTANO_API=https://broker.tudominio.com
+<pre style="background: #15191B; color: #F3F1EA; border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; break-inside: avoid;">flutter build apk --release --dart-define=OCTANO_API=https://rmbroker.retailmanagerpr.com
 # el APK queda en build/app/outputs/flutter-apk/app-release.apk</pre>
 <p>Instala ese APK en el handheld físico de la estación (transferencia directa o un canal de distribución interno — no hace falta tienda de apps para uso propio).</p>
 
